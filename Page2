@@ -1,0 +1,163 @@
+package Login;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.IOException;
+
+public class Page2 extends JFrame {
+	private static final long serialVersionUID = 1L;
+	ImageIcon image = new ImageIcon("lawlibrary.png");
+	 
+	public Page2() {
+		setTitle("U-TRACK Application");
+        setSize(1100, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        setLocationRelativeTo(null);
+                
+        // Gradient panel
+        JPanel background = new JPanel() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g;
+                Color color1 = new Color(195, 210, 255);
+                Color color2 = new Color(72, 91, 171);
+                GradientPaint gp = new GradientPaint(0, 0, color1, 0, getHeight(), color2);
+                g2d.setPaint(gp);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
+        };
+        background.setLayout(null);
+        background.setPreferredSize(new Dimension(500, 350));
+
+        // Login panel
+        JPanel loginPanel = new JPanel();
+        loginPanel.setLayout(null);
+        loginPanel.setBounds(163, 81, 757, 421);
+        loginPanel.setBackground(new Color(255, 255, 255));  // translucent white
+   
+        JLabel lblUsername = new JLabel("username");
+        lblUsername.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        lblUsername.setBounds(276, 103, 123, 37);
+
+        JLabel lblPassword = new JLabel("password");
+        lblPassword.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        lblPassword.setBounds(276, 174, 123, 37);
+        
+        JTextField txtUsername = new JTextField();
+        txtUsername.setBounds(276, 138, 455, 37);
+        txtUsername.setColumns(10);
+
+        JPasswordField txtPassword = new JPasswordField();
+        txtPassword.setBounds(276, 211, 455, 37);
+        
+        JCheckBox chkShowPassword = new JCheckBox("show password");
+        chkShowPassword.setOpaque(false);
+        chkShowPassword.setBackground(new Color(255, 255, 255));
+        chkShowPassword.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        chkShowPassword.setBounds(625, 254, 113, 21);
+        chkShowPassword.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (chkShowPassword.isSelected()) {
+                	chkShowPassword.setOpaque(false);
+                    txtPassword.setEchoChar((char) 0);
+                } else {
+                	chkShowPassword.setOpaque(false);
+                    txtPassword.setEchoChar('•');
+                }
+            }
+        });
+
+        // Login button
+        JButton loginBtn = new JButton("LOGIN");
+        loginBtn.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        loginBtn.setBounds(447, 318, 130, 37);
+        loginBtn.setBackground(new Color(106, 140, 231));
+        loginBtn.setForeground(Color.WHITE);
+        loginBtn.setFocusPainted(false);
+
+        loginBtn.addActionListener(e -> {
+            String username = txtUsername.getText();
+            String password = new String(txtPassword.getPassword());
+
+            // TODO: Add authentication logic here
+            if (username.equalsIgnoreCase("admin") && password.equals("admin123")) {
+                JOptionPane.showMessageDialog(this, "Login successful!");
+                Page3 page3 = new Page3(); // instantiate Page3
+                page3.setVisible(true);    // show Page3
+                dispose();                 // close Login frame
+            } else {
+                JOptionPane.showMessageDialog(this, "Username and/or Password does not match", "Error!", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        loginPanel.add(lblUsername);
+        loginPanel.add(txtUsername);
+        loginPanel.add(lblPassword);
+        loginPanel.add(txtPassword);
+        loginPanel.add(chkShowPassword);
+        loginPanel.add(loginBtn);
+        background.add(loginPanel);
+        
+        // Title
+		JLabel title = new JLabel("LOGIN", SwingConstants.CENTER);
+		title.setBounds(457, 68, 120, 30);
+		loginPanel.add(title);
+		title.setFont(new Font("Arial", Font.BOLD, 20));
+		
+		JLabel lblNewLabel_1 = new JLabel("New label");
+		lblNewLabel_1.setIcon(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\Untitled (Circle Sticker) (6).png"));
+		lblNewLabel_1.setBounds(40, 124, 200, 172);
+		loginPanel.add(lblNewLabel_1);
+        
+        // Top bar panel
+		JPanel topPanel = new JPanel();
+		topPanel.setBackground(new Color(134, 152, 196));
+		topPanel.setBounds(0, 0, 1086, 37);
+		background.add(topPanel);
+		topPanel.setLayout(null);
+
+        // Welcome label (top-right)
+        JLabel welcomeLabel = new JLabel("WELCOME TO U-TRACK");
+        welcomeLabel.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        welcomeLabel.setForeground(Color.DARK_GRAY);
+        welcomeLabel.setBounds(894, 0, 192, 37);
+        topPanel.add(welcomeLabel);
+
+        background.add(topPanel);
+        
+        JButton btnNewButton = new JButton("←\t");
+        btnNewButton.setForeground(new Color(255, 255, 255));
+        btnNewButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        btnNewButton.setBackground(new Color(83, 43, 136));
+        btnNewButton.setBounds(10, 7, 68, 22);
+		topPanel.add(btnNewButton);
+        
+        btnNewButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		try {
+        			Page1 page1Frame = new Page1();
+        			page1Frame.setVisible(true);
+        			dispose();  // close current Login frame
+        		} catch (IOException ex) {
+        			ex.printStackTrace();
+        		}
+        	}
+        });
+
+        getContentPane().add(background);
+        
+        JLabel lblNewLabel_2 = new JLabel("New label");
+        lblNewLabel_2.setIcon(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\umak.png"));
+        lblNewLabel_2.setBounds(0, 0, 1100, 563);
+        background.add(lblNewLabel_2);
+        setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        new Page2();
+    }
+}
