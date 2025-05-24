@@ -1,0 +1,178 @@
+package Login;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+
+import javax.swing.*;
+
+public class Page4 extends JFrame {
+	private static final long serialVersionUID = 1L;
+
+	public Page4() {
+		setTitle("U-TRACK Application");
+		setSize(1100, 600);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
+		setLocationRelativeTo(null);
+
+		// Gradient background panel
+		JPanel gradientPanel = new JPanel() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				Graphics2D g2d = (Graphics2D) g;
+				int width = getWidth();
+				int height = getHeight();
+
+				// Define gradient colors
+				Color color1 = new Color(174, 187, 219);
+				Color color2 = new Color(234, 228, 240);   // Dark purple
+
+				GradientPaint gp = new GradientPaint(0, 0, color1, 0, height, color2);
+				g2d.setPaint(gp);
+				g2d.fillRect(0, 0, width, height);
+			}
+		};
+		gradientPanel.setLayout(null);
+		setContentPane(gradientPanel);
+
+		// Top panel (header bar)
+		JPanel panel = new JPanel();
+		panel.setBackground(new Color(134, 152, 196));
+		panel.setBounds(0, 0, 1086, 37);
+		gradientPanel.add(panel);
+		panel.setLayout(null);
+		
+		JLabel homeLabel = new JLabel("HOME ADMIN", JLabel.CENTER);
+		homeLabel.setBounds(467, 3, 152, 33);
+		homeLabel.setFont(new Font("Consolas", Font.PLAIN, 27));
+		homeLabel.setForeground(Color.BLACK);
+		panel.add(homeLabel);
+		
+		JButton btnDashboard = new JButton("← DASHBOARD");
+		btnDashboard.setForeground(new Color(255, 255, 255));
+		btnDashboard.setFont(new Font("Arial", Font.PLAIN, 12));
+		btnDashboard.setBackground(new Color(83, 43, 136));
+		btnDashboard.setBounds(10, 7, 152, 22);
+        panel.add(btnDashboard);
+        
+        btnDashboard.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		Page3 page3Frame = new Page3();
+				page3Frame.setVisible(true);
+				dispose();
+        	}
+        });
+
+		// Bottom footer panel
+		JPanel panel_2 = new JPanel();
+		panel_2.setBounds(0, 517, 1086, 46);
+		panel_2.setBackground(new Color(134, 152, 196));
+		panel_2.setLayout(null);
+		gradientPanel.add(panel_2);
+		
+		JLabel lblNewLabel_1 = new JLabel("New label");
+		lblNewLabel_1.setIcon(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\logoumak-removebg-preview123.png"));
+		lblNewLabel_1.setBounds(10, 10, 26, 26);
+		panel_2.add(lblNewLabel_1);
+		
+		JLabel lblNewLabel_1_1 = new JLabel("New label");
+		lblNewLabel_1_1.setIcon(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\School-of-Law-SOL.png"));
+		lblNewLabel_1_1.setBounds(200, 10, 26, 26);
+		panel_2.add(lblNewLabel_1_1);
+		
+		JLabel lblNewLabel_2 = new JLabel("University of Makati");
+		lblNewLabel_2.setBounds(46, 17, 131, 13);
+		panel_2.add(lblNewLabel_2);
+		
+		JLabel lblNewLabel_2_1 = new JLabel("School of Law");
+		lblNewLabel_2_1.setBounds(236, 17, 89, 13);
+		panel_2.add(lblNewLabel_2_1);
+
+		// Buttons
+		JButton btnInventoryForm = new JButton("INVENTORY FORM");
+		btnInventoryForm.setBackground(new Color(134, 152, 196));
+		btnInventoryForm.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		btnInventoryForm.setBounds(125, 401, 234, 75);
+		gradientPanel.add(btnInventoryForm);
+		
+		btnInventoryForm.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		Page5 page5Frame = new Page5();
+				page5Frame.setVisible(true);
+				dispose();
+        	}
+        });
+		
+		JButton btnInventoryHistory = new JButton("INVENTORY HISTORY");
+		btnInventoryHistory.setBackground(new Color(134, 152, 196));
+		btnInventoryHistory.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		btnInventoryHistory.setBounds(441, 401, 228, 75);
+		gradientPanel.add(btnInventoryHistory);
+		
+		btnInventoryHistory.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		Page6 page6Frame = new Page6();
+				page6Frame.setVisible(true);
+				dispose();
+        	}
+        });
+
+		JButton btnInventoryArchive = new JButton("INVENTORY ARCHIVE");
+		btnInventoryArchive.setBackground(new Color(134, 152, 196));
+		btnInventoryArchive.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		btnInventoryArchive.setBounds(748, 401, 213, 75);
+		gradientPanel.add(btnInventoryArchive);
+		
+		btnInventoryArchive.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		Page7 page7Frame = new Page7();
+				page7Frame.setVisible(true);
+				dispose();
+        	}
+        });
+
+		// Image label
+		JLabel lblNewLabel = new JLabel("New label");
+		lblNewLabel.setIcon(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\solp3.png")); // Use getResource() for portability
+		lblNewLabel.setBounds(0, 37, 1086, 323);
+		gradientPanel.add(lblNewLabel);
+		
+		JButton btnLogout = new JButton("LOG OUT");
+		btnLogout.setForeground(new Color(255, 255, 255));
+		btnLogout.setFont(new Font("Arial", Font.PLAIN, 12));
+		btnLogout.setBackground(new Color(83, 43, 136));
+		btnLogout.setBounds(924, 7, 152, 22);
+		panel.add(btnLogout);
+        
+		btnLogout.addActionListener(e -> {
+		    SwingUtilities.invokeLater(() -> {
+		        Page1 page1Frame = null;
+				try {
+					page1Frame = new Page1();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+		        page1Frame.setVisible(true);
+		    });
+		    dispose();
+		});
+	}
+
+	// Main method to run the app
+	public static void main(String[] args) {
+		EventQueue.invokeLater(() -> {
+			try {
+				Page4 frame = new Page4();
+				frame.setVisible(true);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+	}
+}
