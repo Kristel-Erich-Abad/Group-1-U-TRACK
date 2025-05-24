@@ -1,0 +1,238 @@
+package Login;
+
+import java.awt.Color;
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.JLabel;
+
+public class Page5 extends JFrame{
+	private static final long serialVersionUID = 1L;
+	private JTextField textField;
+	private JTextField textField_1;
+	private JTextField textField_3;
+	private JTextField textField_4;
+	private JTextField textField_5;
+	private JTextField textField_6;
+	private JTextField textField_7;
+	private JTextField textField_8;
+	private JTextField textField_9;
+
+	public Page5() {
+		setTitle("U-TRACK Application");
+		setSize(1100, 600);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
+		setLocationRelativeTo(null);
+		getContentPane().setLayout(null);
+
+		JPanel gradient = new JPanel() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				Graphics2D g2d = (Graphics2D) g;
+				int width = getWidth();
+				int height = getHeight();
+
+				Color color1 = new Color(174, 187, 219);
+				Color color2 = new Color(234, 228, 240);
+
+				GradientPaint gp = new GradientPaint(0, 0, color1, 0, height, color2);
+				g2d.setPaint(gp);
+				g2d.fillRect(0, 0, width, height);
+			}
+		};
+		gradient.setLayout(null);
+		setContentPane(gradient);
+
+		// Header panel
+		JPanel headerPanel = new JPanel();
+		headerPanel.setBackground(new Color(134, 152, 196));
+		headerPanel.setBounds(0, 0, 1086, 37);
+		gradient.add(headerPanel);
+		headerPanel.setLayout(null);
+
+		JLabel homeLabel = new JLabel("INVENTORY FORM", JLabel.CENTER);
+		homeLabel.setBounds(467, 5, 213, 33);
+		homeLabel.setFont(new Font("Consolas", Font.PLAIN, 27));
+		homeLabel.setForeground(Color.BLACK);
+		headerPanel.add(homeLabel);
+
+		// Footer panel
+		JPanel footerPanel = new JPanel();
+		footerPanel.setBounds(0, 517, 1086, 46);
+		footerPanel.setBackground(new Color(134, 152, 196));
+		footerPanel.setLayout(null);
+		gradient.add(footerPanel);
+
+		JLabel logo1 = new JLabel(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\logoumak-removebg-preview123.png"));
+		logo1.setBounds(10, 10, 26, 26);
+		footerPanel.add(logo1);
+
+		JLabel logo2 = new JLabel(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\School-of-Law-SOL.png"));
+		logo2.setBounds(200, 10, 26, 26);
+		footerPanel.add(logo2);
+
+		JLabel uniLabel = new JLabel("University of Makati");
+		uniLabel.setBounds(46, 17, 131, 13);
+		footerPanel.add(uniLabel);
+
+		JLabel schoolLabel = new JLabel("School of Law");
+		schoolLabel.setBounds(236, 17, 89, 13);
+		footerPanel.add(schoolLabel);
+        
+        JButton btnNewButton = new JButton("SAVE INFORMATION");
+        btnNewButton.setForeground(new Color(255, 255, 255));
+        btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 13));
+        btnNewButton.setBackground(new Color(74, 38, 120));
+        btnNewButton.setBounds(890, 440, 160, 30);
+        getContentPane().add(btnNewButton);
+        
+        textField = new JTextField();
+        textField.setBounds(30, 70, 500, 30);
+        getContentPane().add(textField);
+        textField.setColumns(10);
+        
+        textField_1 = new JTextField();
+        textField_1.setColumns(10);
+        textField_1.setBounds(550, 70, 500, 30);
+        getContentPane().add(textField_1);
+        
+        textField_3 = new JTextField();
+        textField_3.setColumns(10);
+        textField_3.setBounds(30, 350, 500, 30);
+        getContentPane().add(textField_3);
+        
+        textField_4 = new JTextField();
+        textField_4.setColumns(10);
+        textField_4.setBounds(30, 280, 500, 30);
+        getContentPane().add(textField_4);
+        
+        textField_5 = new JTextField();
+        textField_5.setColumns(10);
+        textField_5.setBounds(30, 210, 500, 30);
+        getContentPane().add(textField_5);
+        
+        textField_6 = new JTextField();
+        textField_6.setColumns(10);
+        textField_6.setBounds(30, 140, 500, 30);
+        getContentPane().add(textField_6);
+        
+        textField_7 = new JTextField();
+        textField_7.setColumns(10);
+        textField_7.setBounds(550, 140, 500, 30);
+        getContentPane().add(textField_7);
+        
+        textField_8 = new JTextField();
+        textField_8.setColumns(10);
+        textField_8.setBounds(550, 210, 500, 30);
+        getContentPane().add(textField_8);
+        
+        textField_9 = new JTextField();
+        textField_9.setColumns(10);
+        textField_9.setBounds(550, 280, 500, 30);
+        getContentPane().add(textField_9);
+        
+        JLabel lblNewLabel = new JLabel("ISBN:");
+        lblNewLabel.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblNewLabel.setBounds(40, 240, 155, 30);
+        getContentPane().add(lblNewLabel);
+        
+        JLabel lblAccessionNumber = new JLabel("accession number:");
+        lblAccessionNumber.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblAccessionNumber.setBounds(40, 100, 155, 30);
+        getContentPane().add(lblAccessionNumber);
+        
+        JLabel lblNewLabel_1_1 = new JLabel("call number:");
+        lblNewLabel_1_1.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblNewLabel_1_1.setBounds(40, 170, 155, 30);
+        getContentPane().add(lblNewLabel_1_1);
+        
+        JLabel lblAuthor = new JLabel("author:");
+        lblAuthor.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblAuthor.setBounds(40, 310, 155, 30);
+        getContentPane().add(lblAuthor);
+        
+        JLabel lblTitle = new JLabel("title:");
+        lblTitle.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblTitle.setBounds(40, 380, 155, 30);
+        getContentPane().add(lblTitle);
+        
+        JLabel lblPublisher = new JLabel("publisher:");
+        lblPublisher.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblPublisher.setBounds(560, 100, 155, 30);
+        getContentPane().add(lblPublisher);
+        
+        JLabel lblNewLabel_1_1_1 = new JLabel("place of publication:");
+        lblNewLabel_1_1_1.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblNewLabel_1_1_1.setBounds(560, 170, 155, 30);
+        getContentPane().add(lblNewLabel_1_1_1);
+        
+        JLabel lblNewLabel_1_1_1_1 = new JLabel("copyright year:");
+        lblNewLabel_1_1_1_1.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblNewLabel_1_1_1_1.setBounds(560, 240, 155, 30);
+        getContentPane().add(lblNewLabel_1_1_1_1);
+        
+        JLabel lblNewLabel_1_1_1_1_1 = new JLabel("date and time recorded:");
+        lblNewLabel_1_1_1_1_1.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblNewLabel_1_1_1_1_1.setBounds(560, 310, 195, 30);
+        getContentPane().add(lblNewLabel_1_1_1_1_1);
+        
+		JButton btnHomeAdmin = new JButton("← HOME ADMIN");
+		btnHomeAdmin.setForeground(new Color(255, 255, 255));
+		btnHomeAdmin.setFont(new Font("Arial", Font.PLAIN, 12));
+		btnHomeAdmin.setBackground(new Color(83, 43, 136));
+		btnHomeAdmin.setBounds(10, 7, 152, 22);
+		headerPanel.add(btnHomeAdmin);
+        
+        btnHomeAdmin.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		Page4 page4Frame = new Page4();
+				page4Frame.setVisible(true);
+				dispose();
+        	}
+        });
+        
+        JButton btnLogout = new JButton("LOG OUT");
+		btnLogout.setForeground(new Color(255, 255, 255));
+		btnLogout.setFont(new Font("Arial", Font.PLAIN, 12));
+		btnLogout.setBackground(new Color(83, 43, 136));
+		btnLogout.setBounds(924, 7, 152, 22);
+		headerPanel.add(btnLogout);
+        
+		btnLogout.addActionListener(e -> {
+		    SwingUtilities.invokeLater(() -> {
+		        Page1 page1Frame = null;
+				try {
+					page1Frame = new Page1();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+		        page1Frame.setVisible(true);
+		    });
+		    dispose();
+		});
+		
+        setVisible(true);
+	}
+	
+	public static void main(String[] args) {
+		new Page5();
+	}
+}
