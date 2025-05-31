@@ -1,0 +1,157 @@
+package App;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+
+import javax.swing.*;
+
+public class P4Intern extends JFrame {
+	private static final long serialVersionUID = 1L;
+
+	public P4Intern() {
+		setTitle("U-TRACK Application");
+		setSize(1100, 600);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
+		setLocationRelativeTo(null);
+
+		JPanel gradientPanel = new JPanel() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				Graphics2D g2d = (Graphics2D) g;
+				int width = getWidth();
+				int height = getHeight();
+
+				Color color1 = new Color(174, 187, 219);
+				Color color2 = new Color(234, 228, 240);   
+
+				GradientPaint gp = new GradientPaint(0, 0, color1, 0, height, color2);
+				g2d.setPaint(gp);
+				g2d.fillRect(0, 0, width, height);
+			}
+		};
+		gradientPanel.setLayout(null);
+		setContentPane(gradientPanel);
+
+		JPanel panel = new JPanel();
+		panel.setBackground(new Color(134, 152, 196));
+		panel.setBounds(0, 0, 1086, 37);
+		gradientPanel.add(panel);
+		panel.setLayout(null);
+		
+		JLabel homeLabel = new JLabel("HOME", JLabel.CENTER);
+		homeLabel.setBounds(467, 3, 152, 33);
+		homeLabel.setFont(new Font("Consolas", Font.PLAIN, 27));
+		homeLabel.setForeground(Color.BLACK);
+		panel.add(homeLabel);
+		
+		JButton btnDashboard = new JButton("◄ DASHBOARD");
+		btnDashboard.setForeground(new Color(255, 255, 255));
+		btnDashboard.setFont(new Font("Arial", Font.PLAIN, 12));
+		btnDashboard.setBackground(new Color(83, 43, 136));
+		btnDashboard.setBounds(10, 7, 152, 22);
+        panel.add(btnDashboard);
+        
+        btnDashboard.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		P3Admin page3Frame = new P3Admin();
+				page3Frame.setVisible(true);
+				dispose();
+        	}
+        });
+
+		JPanel panel_2 = new JPanel();
+		panel_2.setBounds(0, 517, 1086, 46);
+		panel_2.setBackground(new Color(134, 152, 196));
+		panel_2.setLayout(null);
+		gradientPanel.add(panel_2);
+		
+		JLabel lblNewLabel_1 = new JLabel("New label");
+		lblNewLabel_1.setIcon(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\logoumak-removebg-preview123.png"));
+		lblNewLabel_1.setBounds(10, 10, 26, 26);
+		panel_2.add(lblNewLabel_1);
+		
+		JLabel lblNewLabel_1_1 = new JLabel("New label");
+		lblNewLabel_1_1.setIcon(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\School-of-Law-SOL.png"));
+		lblNewLabel_1_1.setBounds(200, 10, 26, 26);
+		panel_2.add(lblNewLabel_1_1);
+		
+		JLabel lblNewLabel_2 = new JLabel("University of Makati");
+		lblNewLabel_2.setBounds(46, 17, 131, 13);
+		panel_2.add(lblNewLabel_2);
+		
+		JLabel lblNewLabel_2_1 = new JLabel("School of Law");
+		lblNewLabel_2_1.setBounds(236, 17, 89, 13);
+		panel_2.add(lblNewLabel_2_1);
+		
+		JButton btnInventoryHistory = new JButton("INVENTORY OF BOOKS");
+		btnInventoryHistory.setBackground(new Color(134, 152, 196));
+		btnInventoryHistory.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		btnInventoryHistory.setBounds(289, 401, 228, 75);
+		gradientPanel.add(btnInventoryHistory);
+		
+		btnInventoryHistory.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		P6Intern page6Frame = new P6Intern();
+				page6Frame.setVisible(true);
+				dispose();
+        	}
+        });
+
+		JButton btnInventoryArchive = new JButton("INVENTORY ARCHIVE");
+		btnInventoryArchive.setBackground(new Color(134, 152, 196));
+		btnInventoryArchive.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		btnInventoryArchive.setBounds(569, 401, 228, 75);
+		gradientPanel.add(btnInventoryArchive);
+		
+		btnInventoryArchive.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		P7Home page7Frame = new P7Home();
+				page7Frame.setVisible(true);
+				dispose();
+        	}
+        });
+
+		JLabel lblNewLabel = new JLabel("New label");
+		lblNewLabel.setIcon(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\solp3.png"));
+		lblNewLabel.setBounds(0, 37, 1086, 323);
+		gradientPanel.add(lblNewLabel);
+		
+		JButton btnLogout = new JButton("LOG OUT");
+		btnLogout.setForeground(new Color(255, 255, 255));
+		btnLogout.setFont(new Font("Arial", Font.PLAIN, 12));
+		btnLogout.setBackground(new Color(83, 43, 136));
+		btnLogout.setBounds(924, 7, 152, 22);
+		panel.add(btnLogout);
+        
+		btnLogout.addActionListener(e -> {
+		    SwingUtilities.invokeLater(() -> {
+		        P1 page1Frame = null;
+				try {
+					page1Frame = new P1();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+		        page1Frame.setVisible(true);
+		    });
+		    dispose();
+		});
+	}
+
+	public static void main(String[] args) {
+		EventQueue.invokeLater(() -> {
+			try {
+				P4Intern frame = new P4Intern();
+				frame.setVisible(true);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+	}
+}
