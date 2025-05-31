@@ -1,4 +1,4 @@
-package Login;
+package App;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -7,17 +7,16 @@ import java.io.IOException;
 
 import javax.swing.*;
 
-public class Page4 extends JFrame {
+public class P4Admin extends JFrame {
 	private static final long serialVersionUID = 1L;
 
-	public Page4() {
+	public P4Admin() {
 		setTitle("U-TRACK Application");
 		setSize(1100, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 		setLocationRelativeTo(null);
 
-		// Gradient background panel
 		JPanel gradientPanel = new JPanel() {
 			private static final long serialVersionUID = 1L;
 
@@ -28,9 +27,8 @@ public class Page4 extends JFrame {
 				int width = getWidth();
 				int height = getHeight();
 
-				// Define gradient colors
 				Color color1 = new Color(174, 187, 219);
-				Color color2 = new Color(234, 228, 240);   // Dark purple
+				Color color2 = new Color(234, 228, 240);   
 
 				GradientPaint gp = new GradientPaint(0, 0, color1, 0, height, color2);
 				g2d.setPaint(gp);
@@ -40,20 +38,19 @@ public class Page4 extends JFrame {
 		gradientPanel.setLayout(null);
 		setContentPane(gradientPanel);
 
-		// Top panel (header bar)
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(134, 152, 196));
 		panel.setBounds(0, 0, 1086, 37);
 		gradientPanel.add(panel);
 		panel.setLayout(null);
 		
-		JLabel homeLabel = new JLabel("HOME ADMIN", JLabel.CENTER);
+		JLabel homeLabel = new JLabel("ADMIN", JLabel.CENTER);
 		homeLabel.setBounds(467, 3, 152, 33);
 		homeLabel.setFont(new Font("Consolas", Font.PLAIN, 27));
 		homeLabel.setForeground(Color.BLACK);
 		panel.add(homeLabel);
 		
-		JButton btnDashboard = new JButton("← DASHBOARD");
+		JButton btnDashboard = new JButton("◄ DASHBOARD");
 		btnDashboard.setForeground(new Color(255, 255, 255));
 		btnDashboard.setFont(new Font("Arial", Font.PLAIN, 12));
 		btnDashboard.setBackground(new Color(83, 43, 136));
@@ -62,13 +59,12 @@ public class Page4 extends JFrame {
         
         btnDashboard.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		Page3 page3Frame = new Page3();
+        		P3Admin page3Frame = new P3Admin();
 				page3Frame.setVisible(true);
 				dispose();
         	}
         });
 
-		// Bottom footer panel
 		JPanel panel_2 = new JPanel();
 		panel_2.setBounds(0, 517, 1086, 46);
 		panel_2.setBackground(new Color(134, 152, 196));
@@ -93,30 +89,29 @@ public class Page4 extends JFrame {
 		lblNewLabel_2_1.setBounds(236, 17, 89, 13);
 		panel_2.add(lblNewLabel_2_1);
 
-		// Buttons
 		JButton btnInventoryForm = new JButton("INVENTORY FORM");
 		btnInventoryForm.setBackground(new Color(134, 152, 196));
 		btnInventoryForm.setFont(new Font("Tahoma", Font.PLAIN, 17));
-		btnInventoryForm.setBounds(125, 401, 234, 75);
+		btnInventoryForm.setBounds(36, 401, 228, 75);
 		gradientPanel.add(btnInventoryForm);
 		
 		btnInventoryForm.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		Page5 page5Frame = new Page5();
+        		P5 page5Frame = new P5();
 				page5Frame.setVisible(true);
 				dispose();
         	}
         });
 		
-		JButton btnInventoryHistory = new JButton("INVENTORY HISTORY");
+		JButton btnInventoryHistory = new JButton("INVENTORY OF BOOKS");
 		btnInventoryHistory.setBackground(new Color(134, 152, 196));
 		btnInventoryHistory.setFont(new Font("Tahoma", Font.PLAIN, 17));
-		btnInventoryHistory.setBounds(441, 401, 228, 75);
+		btnInventoryHistory.setBounds(300, 401, 228, 75);
 		gradientPanel.add(btnInventoryHistory);
 		
 		btnInventoryHistory.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		Page6 page6Frame = new Page6();
+        		P6Admin page6Frame = new P6Admin();
 				page6Frame.setVisible(true);
 				dispose();
         	}
@@ -125,20 +120,19 @@ public class Page4 extends JFrame {
 		JButton btnInventoryArchive = new JButton("INVENTORY ARCHIVE");
 		btnInventoryArchive.setBackground(new Color(134, 152, 196));
 		btnInventoryArchive.setFont(new Font("Tahoma", Font.PLAIN, 17));
-		btnInventoryArchive.setBounds(748, 401, 213, 75);
+		btnInventoryArchive.setBounds(562, 401, 228, 75);
 		gradientPanel.add(btnInventoryArchive);
 		
 		btnInventoryArchive.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		Page7 page7Frame = new Page7();
+        		P7Admin page7Frame = new P7Admin();
 				page7Frame.setVisible(true);
 				dispose();
         	}
         });
 
-		// Image label
 		JLabel lblNewLabel = new JLabel("New label");
-		lblNewLabel.setIcon(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\solp3.png")); // Use getResource() for portability
+		lblNewLabel.setIcon(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\solp3.png"));
 		lblNewLabel.setBounds(0, 37, 1086, 323);
 		gradientPanel.add(lblNewLabel);
 		
@@ -148,14 +142,26 @@ public class Page4 extends JFrame {
 		btnLogout.setBackground(new Color(83, 43, 136));
 		btnLogout.setBounds(924, 7, 152, 22);
 		panel.add(btnLogout);
+		
+		JButton btnUserManagement = new JButton("USER MANAGEMENT");
+		btnUserManagement.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		P8UserManagement page8Frame = new P8UserManagement();
+				page8Frame.setVisible(true);
+				dispose();
+        	}
+        });
+		btnUserManagement.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		btnUserManagement.setBackground(new Color(134, 152, 196));
+		btnUserManagement.setBounds(826, 401, 228, 75);
+		gradientPanel.add(btnUserManagement);
         
 		btnLogout.addActionListener(e -> {
 		    SwingUtilities.invokeLater(() -> {
-		        Page1 page1Frame = null;
+		        P1 page1Frame = null;
 				try {
-					page1Frame = new Page1();
+					page1Frame = new P1();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 		        page1Frame.setVisible(true);
@@ -164,11 +170,10 @@ public class Page4 extends JFrame {
 		});
 	}
 
-	// Main method to run the app
 	public static void main(String[] args) {
 		EventQueue.invokeLater(() -> {
 			try {
-				Page4 frame = new Page4();
+				P4Admin frame = new P4Admin();
 				frame.setVisible(true);
 			} catch (Exception e) {
 				e.printStackTrace();
