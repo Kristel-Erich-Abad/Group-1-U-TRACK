@@ -1,0 +1,350 @@
+package App;
+
+import java.awt.*;
+import java.sql.*;
+import java.util.regex.Pattern;
+
+import javax.swing.*;
+import javax.swing.table.*;
+
+public class P8UserManagement extends JFrame {
+    private static final long serialVersionUID = 1L;
+    private JTable table;
+    private DefaultTableModel tableModel;
+    private TableRowSorter<DefaultTableModel> rowSorter;
+    private JTextField txtSearch;
+    private Connection conn;
+
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/UTrack_Management";
+    private static final String DB_USER = "root";
+    private static final String DB_PASS = "nnnikkki14";
+    private JTextField textField, textField_1, textField_2, textField_3;
+
+    public P8UserManagement() {
+        setTitle("U-TRACK Application");
+        setSize(1100, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        getContentPane().setLayout(null);
+
+        JPanel gradient = new JPanel() {
+			private static final long serialVersionUID = 1L;
+
+			protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                int width = getWidth();
+                int height = getHeight();
+                GradientPaint gp = new GradientPaint(0, 0, new Color(174, 187, 219), 0, height, new Color(234, 228, 240));
+                g2d.setPaint(gp);
+                g2d.fillRect(0, 0, width, height);
+            }
+        };
+        gradient.setLayout(null);
+        setContentPane(gradient);
+
+        JPanel headerPanel = new JPanel();
+        headerPanel.setBackground(new Color(134, 152, 196));
+        headerPanel.setBounds(0, 0, 1086, 37);
+        gradient.add(headerPanel);
+        headerPanel.setLayout(null);
+
+        JLabel titleLabel = new JLabel("USER MANAGEMENT", JLabel.CENTER);
+        titleLabel.setBounds(414, 5, 258, 33);
+        titleLabel.setFont(new Font("Consolas", Font.PLAIN, 27));
+        headerPanel.add(titleLabel);
+
+        JButton btnBack = new JButton("◄ ADMIN");
+        btnBack.setForeground(Color.WHITE);
+        btnBack.setFont(new Font("Arial", Font.PLAIN, 12));
+        btnBack.setBackground(new Color(83, 43, 136));
+        btnBack.setBounds(10, 7, 120, 22);
+        headerPanel.add(btnBack);
+        btnBack.addActionListener(e -> {
+            P4Admin page4 = new P4Admin();
+            page4.setVisible(true);
+            dispose();
+        });
+
+        JButton btnLogout = new JButton("LOG OUT");
+        btnLogout.setForeground(Color.WHITE);
+        btnLogout.setFont(new Font("Arial", Font.PLAIN, 12));
+        btnLogout.setBackground(new Color(83, 43, 136));
+        btnLogout.setBounds(924, 7, 152, 22);
+        headerPanel.add(btnLogout);
+        btnLogout.addActionListener(e -> {
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    P1 page1Frame = new P1();
+                    page1Frame.setVisible(true);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+            dispose();
+        });
+
+        JPanel footerPanel = new JPanel();
+        footerPanel.setBounds(0, 517, 1086, 46);
+        footerPanel.setBackground(new Color(134, 152, 196));
+        footerPanel.setLayout(null);
+        gradient.add(footerPanel);
+
+        JLabel logo1 = new JLabel(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\logoumak-removebg-preview123.png"));
+        logo1.setBounds(10, 10, 26, 26);
+        footerPanel.add(logo1);
+
+        JLabel logo2 = new JLabel(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\School-of-Law-SOL.png"));
+        logo2.setBounds(200, 10, 26, 26);
+        footerPanel.add(logo2);
+
+        JLabel uniLabel = new JLabel("University of Makati");
+        uniLabel.setBounds(46, 17, 131, 13);
+        footerPanel.add(uniLabel);
+
+        JLabel schoolLabel = new JLabel("School of Law");
+        schoolLabel.setBounds(236, 17, 89, 13);
+        footerPanel.add(schoolLabel);
+
+        JLabel lblSearch = new JLabel("Search by Username:");
+        lblSearch.setFont(new Font("Arial", Font.PLAIN, 17));
+        lblSearch.setBounds(40, 60, 186, 30);
+         gradient.add(lblSearch);
+
+        txtSearch = new JTextField();
+        txtSearch.setBounds(214, 60, 276, 30);
+        gradient.add(txtSearch);
+
+        String[] columns = { "ID", "Username", "Password", "Role" };
+        tableModel = new DefaultTableModel(columns, 0) {
+			private static final long serialVersionUID = 1L;
+
+			public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        rowSorter = new TableRowSorter<>(tableModel);
+
+        JButton btnSearch = new JButton("Search");
+        btnSearch.setFont(new Font("Arial", Font.BOLD, 14));
+        btnSearch.setBounds(510, 60, 100, 30);
+        gradient.add(btnSearch);
+        btnSearch.addActionListener(e -> {
+            String text = txtSearch.getText().trim();
+            if (!text.matches("^[a-zA-Z]+$")) {
+                JOptionPane.showMessageDialog(null, "Please enter a valid username (letters only, no numbers or symbols).", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            RowFilter<DefaultTableModel, Object> filter = RowFilter.regexFilter("(?i)^" + Pattern.quote(text) + "$", 1);
+            rowSorter.setRowFilter(filter);
+
+            if (table.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(null, "No matching records found.", "Search Result", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        JButton btnRefresh = new JButton("Refresh");
+        btnRefresh.setFont(new Font("Arial", Font.BOLD, 14));
+        btnRefresh.setBounds(620, 60, 100, 30);
+        gradient.add(btnRefresh);
+        btnRefresh.addActionListener(e -> {
+            txtSearch.setText("");
+            rowSorter.setRowFilter(null);
+            clearFields();
+            loadUsers();
+        });
+
+        JButton btnDelete = new JButton("DELETE");
+        btnDelete.setFont(new Font("Arial", Font.BOLD, 20));
+        btnDelete.setBounds(899, 451, 141, 37);
+        gradient.add(btnDelete);
+
+        JButton btnUpdate = new JButton("UPDATE");
+        btnUpdate.setFont(new Font("Arial", Font.BOLD, 20));
+        btnUpdate.setBounds(899, 390, 141, 37);
+        gradient.add(btnUpdate);
+
+        JPanel panel = new JPanel();
+        panel.setBounds(40, 103, 817, 385);
+        gradient.add(panel);
+        panel.setLayout(null);
+
+        table = new JTable(tableModel);
+        table.getTableHeader().setReorderingAllowed(false);
+        table.setRowSorter(rowSorter);
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBounds(33, 184, 747, 171);
+        panel.add(scrollPane);
+
+        textField = new JTextField();
+        textField.setBounds(139, 37, 208, 26);
+        panel.add(textField);
+
+        textField_1 = new JTextField();
+        textField_1.setBounds(139, 93, 208, 26);
+        panel.add(textField_1);
+
+        textField_2 = new JTextField();
+        textField_2.setBounds(516, 37, 208, 26);
+        panel.add(textField_2);
+
+        textField_3 = new JTextField();
+        textField_3.setBounds(516, 93, 208, 26);
+        panel.add(textField_3);
+
+        panel.add(new JLabel("ID:")).setBounds(84, 37, 45, 26);
+        panel.add(new JLabel("Role:")).setBounds(84, 93, 45, 26);
+        panel.add(new JLabel("Username:")).setBounds(400, 37, 106, 26);
+        panel.add(new JLabel("Password:")).setBounds(400, 93, 102, 26);
+
+        table.getSelectionModel().addListSelectionListener(event -> {
+            if (!event.getValueIsAdjusting() && table.getSelectedRow() != -1) {
+                int selectedRow = table.convertRowIndexToModel(table.getSelectedRow());
+                textField.setText(tableModel.getValueAt(selectedRow, 0).toString());
+                textField_1.setText(tableModel.getValueAt(selectedRow, 3).toString());
+                textField_2.setText(tableModel.getValueAt(selectedRow, 1).toString());
+                textField_3.setText(tableModel.getValueAt(selectedRow, 2).toString());
+            }
+        });
+
+        btnUpdate.addActionListener(e -> {
+            try {
+                int id = Integer.parseInt(textField.getText());
+                String role = textField_1.getText().trim();
+                String username = textField_2.getText().trim();
+                String password = textField_3.getText().trim();
+
+                if (username.isEmpty() || password.isEmpty() || role.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Input Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                if (!isValidPassword(password)) {
+    				return;
+    			}
+
+                String updateQuery = "UPDATE users SET username = ?, password = ?, role = ? WHERE id = ?";
+                try (PreparedStatement ps = conn.prepareStatement(updateQuery)) {
+                    ps.setString(1, username);
+                    ps.setString(2, password);
+                    ps.setString(3, role);
+                    ps.setInt(4, id);
+                    int updated = ps.executeUpdate();
+                    if (updated > 0) {
+                        JOptionPane.showMessageDialog(this, "User updated successfully.");
+                        loadUsers();
+                        clearFields();
+                    } else {
+                        JOptionPane.showMessageDialog(this, "No user found with that ID.");
+                    }
+                }
+            } catch (NumberFormatException | SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Failed to update user.");
+            }
+        });
+
+        btnDelete.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this, "Please select a user to delete.", "Warning", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int modelRow = table.convertRowIndexToModel(selectedRow);
+            int id = (int) tableModel.getValueAt(modelRow, 0);
+
+            int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this user?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM users WHERE id = ?")) {
+                    ps.setInt(1, id);
+                    int deleted = ps.executeUpdate();
+                    if (deleted > 0) {
+                        JOptionPane.showMessageDialog(this, "User deleted successfully.");
+                        loadUsers();
+                        clearFields();
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Failed to delete user.");
+                }
+            }
+        });
+
+        try {
+            conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to connect to database.");
+            System.exit(1);
+        }
+
+        loadUsers();
+        setVisible(true);
+    }
+
+    private void loadUsers() {
+        tableModel.setRowCount(0);
+        String query = "SELECT id, username, password, role FROM users";
+        try (PreparedStatement ps = conn.prepareStatement(query); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                tableModel.addRow(new Object[]{
+                    rs.getInt("id"),
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    rs.getString("role")
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to load users.");
+        }
+    }
+
+    private boolean isValidPassword(String password) {
+		if (password.length() < 8) {
+			JOptionPane.showMessageDialog(this, "Password must be at least 8 characters.");
+			return false;
+		}
+		if (!password.matches(".*[A-Z].*")) {
+			JOptionPane.showMessageDialog(this, "Password must contain at least one uppercase letter.");
+			return false;
+		}
+		if (!password.matches(".*[a-z].*")) {
+			JOptionPane.showMessageDialog(this, "Password must contain at least one lowercase letter.");
+			return false;
+		}
+		if (!password.matches(".*\\d.*")) {
+			JOptionPane.showMessageDialog(this, "Password must contain at least one number.");
+			return false;
+		}
+		if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*")) {
+			JOptionPane.showMessageDialog(this, "Password must contain at least one special character.");
+			return false;
+		}
+		return true;
+	}
+    
+    private void clearFields() {
+        textField.setText("");
+        textField_1.setText("");
+        textField_2.setText("");
+        textField_3.setText("");
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        try {
+            if (conn != null && !conn.isClosed()) conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(P8UserManagement::new);
+    }
+}
