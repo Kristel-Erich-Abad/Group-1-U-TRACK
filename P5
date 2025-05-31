@@ -1,0 +1,580 @@
+package App;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+public class P5 extends JFrame {
+    private static final long serialVersionUID = 1L;
+    private JTextField txtAccessionNumber, txtTitle, txtISBN, txtCallNumber, txtCopyrightYear, txtDateTimeRecorded;
+    private JComboBox<String> cboAuthorFirstName, cboAuthorLastName, cboPublisher, cboPlaceOfPublication;
+    private DefaultTableModel tableModel;
+    
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/UTrack_Management";
+    private static final String DB_USER = "root";
+    private static final String DB_PASS = "nnnikkki14";
+    
+    public P5() {
+        setTitle("U-TRACK Application");
+        setSize(1100, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        getContentPane().setLayout(null);
+
+        JPanel gradient = new JPanel() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                int width = getWidth();
+                int height = getHeight();
+
+                Color color1 = new Color(174, 187, 219);
+                Color color2 = new Color(234, 228, 240);
+
+                GradientPaint gp = new GradientPaint(0, 0, color1, 0, height, color2);
+                g2d.setPaint(gp);
+                g2d.fillRect(0, 0, width, height);
+            }
+        };
+        gradient.setLayout(null);
+        setContentPane(gradient);
+
+        JPanel headerPanel = new JPanel();
+        headerPanel.setBackground(new Color(134, 152, 196));
+        headerPanel.setBounds(0, 0, 1086, 37);
+        gradient.add(headerPanel);
+        headerPanel.setLayout(null);
+
+        JLabel homeLabel = new JLabel("INVENTORY FORM", JLabel.CENTER);
+        homeLabel.setBounds(436, 5, 213, 33);
+        homeLabel.setFont(new Font("Consolas", Font.PLAIN, 27));
+        homeLabel.setForeground(Color.BLACK);
+        headerPanel.add(homeLabel);
+
+        JPanel footerPanel = new JPanel();
+        footerPanel.setBounds(0, 517, 1086, 46);
+        footerPanel.setBackground(new Color(134, 152, 196));
+        footerPanel.setLayout(null);
+        gradient.add(footerPanel);
+
+        JLabel logo1 = new JLabel(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\logoumak-removebg-preview123.png"));
+        logo1.setBounds(10, 10, 26, 26);
+        footerPanel.add(logo1);
+
+        JLabel logo2 = new JLabel(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\School-of-Law-SOL.png"));
+        logo2.setBounds(200, 10, 26, 26);
+        footerPanel.add(logo2);
+
+        JLabel uniLabel = new JLabel("University of Makati");
+        uniLabel.setBounds(46, 17, 131, 13);
+        footerPanel.add(uniLabel);
+
+        JLabel schoolLabel = new JLabel("School of Law");
+        schoolLabel.setBounds(236, 17, 89, 13);
+        footerPanel.add(schoolLabel);
+
+        JButton btnNewButton = new JButton("SAVE INFORMATION");
+        btnNewButton.setForeground(new Color(255, 255, 255));
+        btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 13));
+        btnNewButton.setBackground(new Color(74, 38, 120));
+        btnNewButton.setBounds(890, 419, 160, 30);
+        gradient.add(btnNewButton);
+        
+        JButton btnClear = new JButton("CLEAR FIELDS");
+        btnClear.setForeground(new Color(255, 255, 255));
+        btnClear.setFont(new Font("Tahoma", Font.PLAIN, 13));
+        btnClear.setBackground(new Color(74, 38, 120));
+        btnClear.setBounds(890, 459, 160, 30);
+        gradient.add(btnClear);
+        
+        btnClear.addActionListener(e -> clearFields());
+
+        txtAccessionNumber = new JTextField();
+        txtAccessionNumber.setFont(new Font("Arial", Font.PLAIN, 15));
+        txtAccessionNumber.setBounds(30, 70, 500, 30);
+        gradient.add(txtAccessionNumber);
+        txtAccessionNumber.setColumns(10);
+
+        txtTitle = new JTextField();
+        txtTitle.setFont(new Font("Arial", Font.PLAIN, 15));
+        txtTitle.setColumns(10);
+        txtTitle.setBounds(550, 70, 500, 30);
+        gradient.add(txtTitle);
+
+        txtISBN = new JTextField();
+        txtISBN.setFont(new Font("Arial", Font.PLAIN, 15));
+        txtISBN.setColumns(10);
+        txtISBN.setBounds(30, 210, 500, 30);
+        gradient.add(txtISBN);
+
+        txtCallNumber = new JTextField();
+        txtCallNumber.setFont(new Font("Arial", Font.PLAIN, 15));
+        txtCallNumber.setColumns(10);
+        txtCallNumber.setBounds(30, 140, 500, 30);
+        gradient.add(txtCallNumber);
+
+        txtCopyrightYear = new JTextField();
+        txtCopyrightYear.setFont(new Font("Arial", Font.PLAIN, 15));
+        txtCopyrightYear.setColumns(10);
+        txtCopyrightYear.setBounds(550, 280, 500, 30);
+        gradient.add(txtCopyrightYear);
+
+        txtDateTimeRecorded = new JTextField();
+        txtDateTimeRecorded.setFont(new Font("Arial", Font.PLAIN, 15));
+        txtDateTimeRecorded.setColumns(10);
+        txtDateTimeRecorded.setBounds(550, 350, 500, 30);
+        gradient.add(txtDateTimeRecorded);
+
+        JLabel lblISBN = new JLabel("ISBN:");
+        lblISBN.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblISBN.setBounds(40, 180, 155, 30);
+        gradient.add(lblISBN);
+
+        JLabel lblAccessionNumber = new JLabel("Accession Number:");
+        lblAccessionNumber.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblAccessionNumber.setBounds(40, 40, 200, 30);
+        gradient.add(lblAccessionNumber);
+
+        JLabel lblCallNumber = new JLabel("Call Number:");
+        lblCallNumber.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblCallNumber.setBounds(40, 110, 155, 30);
+        gradient.add(lblCallNumber);
+
+        JLabel lblAuthorFirstName = new JLabel("Author (First Name):");
+        lblAuthorFirstName.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblAuthorFirstName.setBounds(40, 250, 155, 30);
+        gradient.add(lblAuthorFirstName);
+
+        JLabel lblTitle = new JLabel("Title:");
+        lblTitle.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblTitle.setBounds(560, 40, 155, 30);
+        gradient.add(lblTitle);
+
+        JLabel lblPublisher = new JLabel("Publisher:");
+        lblPublisher.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblPublisher.setBounds(560, 110, 155, 30);
+        gradient.add(lblPublisher);
+
+        JLabel lblPlacePublication = new JLabel("Place of Publication:");
+        lblPlacePublication.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblPlacePublication.setBounds(560, 180, 200, 30);
+        gradient.add(lblPlacePublication);
+
+        JLabel lblCopyrightYear = new JLabel("Copyright Year:");
+        lblCopyrightYear.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblCopyrightYear.setBounds(560, 250, 155, 30);
+        gradient.add(lblCopyrightYear);
+
+        JLabel lblDateTimeRecorded = new JLabel("Date and Time Recorded:");
+        lblDateTimeRecorded.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblDateTimeRecorded.setBounds(560, 320, 200, 30);
+        gradient.add(lblDateTimeRecorded);
+
+        JLabel lblAuthorLastName = new JLabel("Author (Last Name):");
+        lblAuthorLastName.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 15));
+        lblAuthorLastName.setBounds(40, 320, 155, 30);
+        gradient.add(lblAuthorLastName);
+
+        JButton btnHomeAdmin = new JButton("◄ ADMIN");
+        btnHomeAdmin.setForeground(new Color(255, 255, 255));
+        btnHomeAdmin.setFont(new Font("Arial", Font.PLAIN, 12));
+        btnHomeAdmin.setBackground(new Color(83, 43, 136));
+        btnHomeAdmin.setBounds(10, 7, 152, 22);
+        headerPanel.add(btnHomeAdmin);
+
+        btnHomeAdmin.addActionListener(e -> {
+            P4Admin page4Frame = new P4Admin();
+            page4Frame.setVisible(true);
+            System.out.println("Navigate to P4Admin");
+            dispose();
+        });
+
+        JButton btnLogout = new JButton("LOG OUT");
+        btnLogout.setForeground(new Color(255, 255, 255));
+        btnLogout.setFont(new Font("Arial", Font.PLAIN, 12));
+        btnLogout.setBackground(new Color(83, 43, 136));
+        btnLogout.setBounds(924, 7, 152, 22);
+        headerPanel.add(btnLogout);
+
+        btnLogout.addActionListener(e -> {
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    P1 page1Frame = new P1();
+                    page1Frame.setVisible(true);
+                    System.out.println("Navigate to P1");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+            dispose();
+        });
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        txtDateTimeRecorded.setText(dtf.format(now));
+        txtDateTimeRecorded.setEditable(false);
+        
+        cboAuthorFirstName = new JComboBox<>();
+        cboAuthorFirstName.setEditable(true);
+        cboAuthorFirstName.setBounds(30, 281, 500, 30);
+        gradient.add(cboAuthorFirstName);
+        
+        cboAuthorLastName = new JComboBox<>();
+        cboAuthorLastName.setEditable(true);
+        cboAuthorLastName.setBounds(30, 351, 500, 30);
+        gradient.add(cboAuthorLastName);
+        
+        cboPublisher = new JComboBox<>();
+        cboPublisher.setEditable(true); 
+        cboPublisher.setBounds(550, 141, 500, 30);
+        gradient.add(cboPublisher);
+        
+        cboPlaceOfPublication = new JComboBox<>();
+        cboPlaceOfPublication.setEditable(true);
+        cboPlaceOfPublication.setBounds(550, 210, 500, 30);
+        gradient.add(cboPlaceOfPublication);
+
+        loadAuthors();
+        loadPublishers();
+
+        setupAutomaticPopulation();
+
+        btnNewButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveInformationToDatabase();
+            }
+        });
+
+        setVisible(true);
+    }
+
+    private void setupAutomaticPopulation() {
+        cboAuthorFirstName.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    String selectedFirstName = (String) cboAuthorFirstName.getSelectedItem();
+                    if (selectedFirstName != null && !selectedFirstName.trim().isEmpty()) {
+                        loadLastNamesForFirstName(selectedFirstName.trim());
+                    }
+                }
+            }
+        });
+
+        cboPublisher.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    String selectedPublisher = (String) cboPublisher.getSelectedItem();
+                    if (selectedPublisher != null && !selectedPublisher.trim().isEmpty()) {
+                        loadPlacesForPublisher(selectedPublisher.trim());
+                    }
+                }
+            }
+        });
+    }
+
+    private void loadLastNamesForFirstName(String firstName) {
+        String sql = "SELECT DISTINCT author_lastname FROM Authors WHERE author_firstname = ? ORDER BY author_lastname";
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, firstName);
+            try (ResultSet rs = ps.executeQuery()) {
+                cboAuthorLastName.removeAllItems();
+                while (rs.next()) {
+                    cboAuthorLastName.addItem(rs.getString("author_lastname"));
+                }
+                if (cboAuthorLastName.getItemCount() == 1) {
+                    cboAuthorLastName.setSelectedIndex(0);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error loading last names: " + e.getMessage());
+        }
+    }
+
+    private void loadPlacesForPublisher(String publisherName) {
+        String sql = "SELECT DISTINCT place_of_publication FROM Publishers WHERE publisher_name = ? ORDER BY place_of_publication";
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, publisherName);
+            try (ResultSet rs = ps.executeQuery()) {
+                cboPlaceOfPublication.removeAllItems();
+                while (rs.next()) {
+                    cboPlaceOfPublication.addItem(rs.getString("place_of_publication"));
+                }
+                if (cboPlaceOfPublication.getItemCount() == 1) {
+                    cboPlaceOfPublication.setSelectedIndex(0);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error loading places of publication: " + e.getMessage());
+        }
+    }
+    
+    public void loadDataFromDatabase() {
+        if (tableModel != null) {
+            tableModel.setRowCount(0);
+        }
+
+        String sql = "SELECT b.accession_number, b.call_number, b.isbn, a.author_firstname, a.author_lastname, b.title, p.publisher_name, "
+        		+ "p.place_of_publication, b.copyright_year, b.date_and_time_recorded FROM Books b JOIN Authors a ON b.author_id = a.author_id "
+        		+ "JOIN Publishers p ON b.publisher_id = p.publisher_id";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Object[] row = {
+                    rs.getString("accession_number"),
+                    rs.getString("call_number"),
+                    rs.getString("isbn"),
+                    rs.getString("author_firstname"),
+                    rs.getString("author_lastname"),
+                    rs.getString("title"),
+                    rs.getString("publisher_name"),
+                    rs.getString("place_of_publication"),
+                    rs.getString("copyright_year"),
+                    rs.getString("date_and_time_recorded")
+                };
+                tableModel.addRow(row);
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error loading data: " + ex.getMessage());
+        }
+    }
+
+    private void saveInformationToDatabase() {
+        String accessionNumber = txtAccessionNumber.getText().trim();
+        String publisherName = getComboBoxValue(cboPublisher);
+        String authorFirstName = getComboBoxValue(cboAuthorFirstName);
+        String authorLastName = getComboBoxValue(cboAuthorLastName);
+        String title = txtTitle.getText().trim();
+        String isbn = txtISBN.getText().trim();
+        String callNumber = txtCallNumber.getText().trim();
+        String placeOfPublication = getComboBoxValue(cboPlaceOfPublication);
+        String copyrightYear = txtCopyrightYear.getText().trim();
+        String dateTimeRecorded = txtDateTimeRecorded.getText().trim();
+
+        if (accessionNumber.isEmpty() || publisherName.isEmpty() || authorFirstName.isEmpty() || authorLastName.isEmpty() ||
+                title.isEmpty() || isbn.isEmpty() || callNumber.isEmpty() || placeOfPublication.isEmpty() ||
+                copyrightYear.isEmpty() || dateTimeRecorded.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all required fields.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String normalizedIsbn = isbn.replaceAll("[-\\s]", "");
+        if (!normalizedIsbn.matches("\\d{10}|\\d{13}")) {
+            JOptionPane.showMessageDialog(this, "Invalid ISBN format. Please enter a valid ISBN-10 or ISBN-13.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            int year = Integer.parseInt(copyrightYear);
+            int currentYear = LocalDateTime.now().getYear();
+            if (year < 1450 || year > currentYear) {
+                JOptionPane.showMessageDialog(this, "Copyright year must be between 1450 and " + currentYear + ".", "Validation Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Copyright year must be a valid number.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (doesAccessionNumberExist(accessionNumber)) {
+            JOptionPane.showMessageDialog(this, "Accession number already exists. Please enter a unique one.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS)) {
+            conn.setAutoCommit(false);
+
+            try {
+                int authorId = getOrInsertAuthor(conn, authorFirstName, authorLastName);
+                int publisherId = getOrInsertPublisher(conn, publisherName, placeOfPublication);
+
+                String sqlInsertBook = "INSERT INTO Books (accession_number, call_number, isbn, author_id, title, publisher_id, copyright_year, date_and_time_recorded) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                try (PreparedStatement ps = conn.prepareStatement(sqlInsertBook)) {
+                    ps.setString(1, accessionNumber);
+                    ps.setString(2, callNumber);
+                    ps.setString(3, isbn);
+                    ps.setInt(4, authorId);
+                    ps.setString(5, title);
+                    ps.setInt(6, publisherId);
+                    ps.setString(7, copyrightYear);
+                    ps.setString(8, dateTimeRecorded);
+
+                    int rowsInserted = ps.executeUpdate();
+
+                    if (rowsInserted > 0) {
+                        conn.commit();
+                        JOptionPane.showMessageDialog(this, "Information saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        clearFields();
+                        loadAuthors();
+                        loadPublishers();
+                    } else {
+                        conn.rollback();
+                        JOptionPane.showMessageDialog(this, "Failed to save information.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } catch (SQLException ex) {
+                conn.rollback();
+                throw ex;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Database error: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private String getComboBoxValue(JComboBox<String> comboBox) {
+        Object selected = comboBox.getSelectedItem();
+        if (selected != null) {
+            return selected.toString().trim();
+        }
+        return "";
+    }
+
+    private int getOrInsertAuthor(Connection conn, String firstName, String lastName) throws SQLException {
+        String selectSQL = "SELECT author_id FROM Authors WHERE author_firstname = ? AND author_lastname = ?";
+        try (PreparedStatement ps = conn.prepareStatement(selectSQL)) {
+            ps.setString(1, firstName);
+            ps.setString(2, lastName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("author_id");
+                }
+            }
+        }
+
+        String insertSQL = "INSERT INTO Authors (author_firstname, author_lastname) VALUES (?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(insertSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, firstName);
+            ps.setString(2, lastName);
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        throw new SQLException("Failed to insert or retrieve author ID.");
+    }
+
+    private void loadAuthors() {
+        String sql = "SELECT DISTINCT author_firstname FROM Authors ORDER BY author_firstname";
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            cboAuthorFirstName.removeAllItems();
+            while (rs.next()) {
+                cboAuthorFirstName.addItem(rs.getString("author_firstname"));
+            }
+            cboAuthorFirstName.setSelectedIndex(-1); 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadPublishers() {
+        String sql = "SELECT DISTINCT publisher_name FROM Publishers ORDER BY publisher_name";
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            cboPublisher.removeAllItems();
+            while (rs.next()) {
+                cboPublisher.addItem(rs.getString("publisher_name"));
+            }
+            cboPublisher.setSelectedIndex(-1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private int getOrInsertPublisher(Connection conn, String publisherName, String placeOfPublication) throws SQLException {
+        String selectSQL = "SELECT publisher_id FROM Publishers WHERE publisher_name = ? AND place_of_publication = ?";
+        try (PreparedStatement ps = conn.prepareStatement(selectSQL)) {
+            ps.setString(1, publisherName);
+            ps.setString(2, placeOfPublication);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("publisher_id");
+                }
+            }
+        }
+
+        String insertSQL = "INSERT INTO Publishers (publisher_name, place_of_publication) VALUES (?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(insertSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, publisherName);
+            ps.setString(2, placeOfPublication);
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        throw new SQLException("Failed to insert or retrieve publisher ID.");
+    }
+
+    private boolean doesAccessionNumberExist(String accessionNumber) {
+        String query = "SELECT COUNT(*) FROM Books WHERE accession_number = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, accessionNumber);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    private void clearFields() {
+        txtAccessionNumber.setText("");
+        txtTitle.setText("");
+        txtISBN.setText("");
+        txtCallNumber.setText("");
+        txtCopyrightYear.setText("");
+        cboAuthorFirstName.setSelectedIndex(-1);
+        cboAuthorLastName.setSelectedIndex(-1);
+        cboPublisher.setSelectedIndex(-1);
+        cboPlaceOfPublication.setSelectedIndex(-1);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        txtDateTimeRecorded.setText(dtf.format(LocalDateTime.now()));
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getLookAndFeel());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            new P5();
+        });
+    }
+}
