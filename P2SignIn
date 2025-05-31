@@ -1,0 +1,211 @@
+package App;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class P2SignIn extends JFrame {
+    private static final long serialVersionUID = 1L;
+
+    public P2SignIn() {
+        setTitle("U-TRACK Application");
+        setSize(1100, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        setLocationRelativeTo(null);
+
+        ImageIcon backgroundImage = new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\umak.png");
+        JLabel background = new JLabel(backgroundImage);
+        background.setLayout(null);
+        background.setBounds(0, 0, 1100, 600);
+
+        JPanel topPanel = new JPanel(null);
+        topPanel.setBackground(new Color(134, 152, 196));
+        topPanel.setBounds(0, 0, 1100, 37);
+
+        JLabel welcomeLabel = new JLabel("WELCOME TO U-TRACK");
+        welcomeLabel.setFont(new Font("Archivo", Font.PLAIN, 15));
+        welcomeLabel.setForeground(new Color(12, 12, 12));
+        welcomeLabel.setBounds(894, 0, 192, 37);
+        topPanel.add(welcomeLabel);
+
+        JButton backBtn = new JButton("◄ Back");
+        backBtn.setBounds(10, 7, 75, 22);
+        backBtn.setBackground(new Color(105, 59, 164));
+        backBtn.setForeground(Color.WHITE);
+        backBtn.setFont(new Font("Arial", Font.PLAIN, 11));
+        backBtn.addActionListener(e -> {
+            try {
+                new P1().setVisible(true);
+                dispose();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+        topPanel.add(backBtn);
+        background.add(topPanel);
+
+        RoundedPanel loginPanel = new RoundedPanel(90);
+        loginPanel.setLayout(null);
+        loginPanel.setBounds(163, 81, 757, 421);
+        loginPanel.setBackground(Color.WHITE);
+
+        JLabel lblUsername = new JLabel("username");
+        lblUsername.setForeground(new Color(174, 187, 219));
+        lblUsername.setFont(new Font("Afacad", Font.BOLD, 15));
+        lblUsername.setBounds(276, 103, 123, 37);
+
+        JTextField txtUsername = new JTextField();
+        txtUsername.setBorder(BorderFactory.createLineBorder(new Color(174, 187, 219), 2));
+        txtUsername.setBounds(276, 138, 455, 37);
+        txtUsername.setColumns(10);
+
+        JLabel lblPassword = new JLabel("password");
+        lblPassword.setForeground(new Color(174, 187, 219));
+        lblPassword.setFont(new Font("Afacad", Font.BOLD, 15));
+        lblPassword.setBounds(276, 174, 123, 37);
+
+        JPasswordField txtPassword = new JPasswordField();
+        txtPassword.setBorder(BorderFactory.createLineBorder(new Color(174, 187, 219), 2));
+        txtPassword.setBounds(276, 211, 455, 37);
+
+        JCheckBox chkShowPassword = new JCheckBox("show password");
+        chkShowPassword.setOpaque(false);
+        chkShowPassword.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        chkShowPassword.setBounds(625, 254, 113, 21);
+        chkShowPassword.addActionListener(e -> {
+            txtPassword.setEchoChar(chkShowPassword.isSelected() ? (char) 0 : '•');
+        });
+
+        RoundedButton loginBtn = new RoundedButton("Sign In", 30);
+        loginBtn.setBounds(447, 318, 130, 37);
+        loginBtn.setBackground(new Color(134, 152, 196));
+        loginBtn.setFont(new Font("Archivo", Font.PLAIN, 17));
+        loginBtn.setForeground(Color.WHITE);
+        loginBtn.setFocusPainted(false);
+        loginBtn.addActionListener(e -> {
+            String username = txtUsername.getText();
+            String password = new String(txtPassword.getPassword());
+
+            if (username.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Warning", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            try (Connection conn = DriverManager.getConnection(
+                    "jdbc:mysql://localhost:3306/UTrack_Management", "root", "nnnikkki14")) {
+                
+                String query = "SELECT role FROM users WHERE username = ? AND password = ?";
+                PreparedStatement ps = conn.prepareStatement(query);
+                ps.setString(1, username);
+                ps.setString(2, password);
+                
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    String role = rs.getString("role");
+                    JOptionPane.showMessageDialog(this, "Login successful!");
+
+                    if ("admin".equalsIgnoreCase(role)) {
+                        new P3Admin().setVisible(true);
+                    } else if ("intern".equalsIgnoreCase(role)) {
+                        new P3Intern().setVisible(true);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Unknown role!", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                    dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Username and/or Password does not match", "Error!", JOptionPane.ERROR_MESSAGE);
+                    txtPassword.setText("");
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        });
+
+        JLabel title = new JLabel("SIGN IN", SwingConstants.CENTER);
+        title.setBounds(276, 68, 455, 30);
+        title.setFont(new Font("Archivo", Font.BOLD, 25));
+
+        JLabel iconLabel = new JLabel();
+        iconLabel.setIcon(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\Untitled (Circle Sticker) (6).png"));
+        iconLabel.setBounds(40, 124, 200, 172);
+
+        loginPanel.add(lblUsername);
+        loginPanel.add(txtUsername);
+        loginPanel.add(lblPassword);
+        loginPanel.add(txtPassword);
+        loginPanel.add(chkShowPassword);
+        loginPanel.add(loginBtn);
+        loginPanel.add(title);
+        loginPanel.add(iconLabel);
+
+        background.add(loginPanel);
+        setContentPane(background);
+
+        setVisible(true);
+    }
+
+    class RoundedPanel extends JPanel {
+        private static final long serialVersionUID = 1L;
+        private int cornerRadius;
+
+        public RoundedPanel(int radius) {
+            this.cornerRadius = radius;
+            setOpaque(false);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getBackground());
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), cornerRadius, cornerRadius);
+        }
+    }
+    
+    public class RoundedButton extends JButton {
+        private static final long serialVersionUID = 1L;
+        private int radius;
+
+        public RoundedButton(String text, int radius) {
+            super(text);
+            this.radius = radius;
+            setContentAreaFilled(false);
+            setFocusPainted(false);
+            setBorderPainted(false);
+            setOpaque(false);
+            setForeground(Color.WHITE);
+            setFont(new Font("Tahoma", Font.PLAIN, 15));
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            g2.setColor(getBackground());
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+
+            super.paintComponent(g);
+            g2.dispose();
+        }
+
+        @Override
+        protected void paintBorder(Graphics g) {
+            g.setColor(new Color(174, 187, 219));
+            g.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
+        }
+    }
+    
+    public static void main(String[] args) {
+        new P2SignIn();
+    }
+}
