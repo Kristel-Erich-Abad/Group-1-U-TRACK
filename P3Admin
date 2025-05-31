@@ -1,0 +1,292 @@
+package App;
+
+import java.awt.*;
+import java.sql.*;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+public class P3Admin extends JFrame {
+    private static final long serialVersionUID = 1L;
+
+    private JLabel lblTotalBooks, lblPublishersCount, lblArchivedBooks, lblTotalAuthors, lblTotalTitles;
+    private DefaultTableModel tableModel;
+    private JTable table;
+
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/UTrack_Management";
+    private static final String DB_USER = "root";
+    private static final String DB_PASS = "nnnikkki14";
+
+    public P3Admin() {
+        setTitle("U-TRACK Application");
+        setSize(1100, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        getContentPane().setLayout(null);
+
+        JPanel gradient = new JPanel() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                int width = getWidth();
+                int height = getHeight();
+
+                Color color1 = new Color(237, 231, 244);
+                Color color2 = new Color(47, 24, 75);
+
+                GradientPaint gp = new GradientPaint(0, 0, color1, 0, height, color2);
+                g2d.setPaint(gp);
+                g2d.fillRect(0, 0, width, height);
+            }
+        };
+        gradient.setLayout(null);
+        setContentPane(gradient);
+        
+        JPanel headerPanel = new JPanel();
+        headerPanel.setBackground(new Color(134, 152, 196));
+        headerPanel.setBounds(0, 0, 1086, 37);
+        gradient.add(headerPanel);
+        headerPanel.setLayout(null);
+
+        JLabel homeLabel = new JLabel("DASHBOARD", JLabel.CENTER);
+        homeLabel.setBounds(474, 5, 137, 33);
+        homeLabel.setFont(new Font("Consolas", Font.PLAIN, 27));
+        homeLabel.setForeground(Color.BLACK);
+        headerPanel.add(homeLabel);
+
+        JButton btnLogout = new JButton("LOG OUT");
+        btnLogout.setForeground(Color.WHITE);
+        btnLogout.setFont(new Font("Arial", Font.PLAIN, 12));
+        btnLogout.setBackground(new Color(83, 43, 136));
+        btnLogout.setBounds(924, 7, 152, 22);
+        headerPanel.add(btnLogout);
+
+        btnLogout.addActionListener(e -> {
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    P1 page1Frame = new P1();
+                    page1Frame.setVisible(true);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+            dispose();
+        });
+
+        JPanel footerPanel = new JPanel();
+        footerPanel.setBounds(0, 517, 1086, 46);
+        footerPanel.setBackground(new Color(134, 152, 196));
+        footerPanel.setLayout(null);
+        gradient.add(footerPanel);
+
+        JLabel logo1 = new JLabel(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\logoumak-removebg-preview123.png"));
+        logo1.setBounds(10, 10, 26, 26);
+        footerPanel.add(logo1);
+
+        JLabel logo2 = new JLabel(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\School-of-Law-SOL.png"));
+        logo2.setBounds(200, 10, 26, 26);
+        footerPanel.add(logo2);
+
+        JLabel uniLabel = new JLabel("University of Makati");
+        uniLabel.setBounds(46, 17, 131, 13);
+        footerPanel.add(uniLabel);
+
+        JLabel schoolLabel = new JLabel("School of Law");
+        schoolLabel.setBounds(236, 17, 89, 13);
+        footerPanel.add(schoolLabel);
+
+        JPanel panelTotalBooks = new JPanel();
+        panelTotalBooks.setBackground(new Color(244, 239, 250));
+        panelTotalBooks.setBounds(40, 80, 180, 130);
+        gradient.add(panelTotalBooks);
+        panelTotalBooks.setLayout(null);
+
+        lblTotalBooks = new JLabel("0", JLabel.CENTER);
+        lblTotalBooks.setForeground(new Color(83, 43, 136));
+        lblTotalBooks.setFont(new Font("Bayon", Font.BOLD, 50));
+        lblTotalBooks.setBounds(10, 10, 160, 80);
+        panelTotalBooks.add(lblTotalBooks);
+
+        JLabel lblTotalBooks_1 = new JLabel("TOTAL BOOKS", JLabel.CENTER);
+        lblTotalBooks_1.setForeground(new Color(47, 24, 75));
+        lblTotalBooks_1.setFont(new Font("Dialog", Font.BOLD, 15));
+        lblTotalBooks_1.setBounds(10, 91, 160, 29);
+        panelTotalBooks.add(lblTotalBooks_1);
+
+        JPanel panelPublishersCount = new JPanel();
+        panelPublishersCount.setBackground(new Color(47, 24, 75));
+        panelPublishersCount.setBounds(245, 80, 180, 130);
+        gradient.add(panelPublishersCount);
+        panelPublishersCount.setLayout(null);
+
+        lblPublishersCount = new JLabel("0", JLabel.CENTER);
+        lblPublishersCount.setForeground(new Color(155, 114, 207));
+        lblPublishersCount.setForeground(Color.WHITE);
+        lblPublishersCount.setFont(new Font("Bayon", Font.BOLD, 50));
+        lblPublishersCount.setBounds(10, 10, 160, 80);
+        panelPublishersCount.add(lblPublishersCount);
+
+        JLabel lblPublishersCount_1 = new JLabel("TOTAL PUBLISHERS", JLabel.CENTER);
+        lblPublishersCount_1.setForeground(Color.WHITE);
+        lblPublishersCount_1.setFont(new Font("Bayon", Font.BOLD, 15));
+        lblPublishersCount_1.setBounds(10, 91, 160, 29);
+        panelPublishersCount.add(lblPublishersCount_1);
+
+        JPanel panelArchivedBooks = new JPanel();
+        panelArchivedBooks.setLayout(null);
+        panelArchivedBooks.setBackground(new Color(83, 43, 136));
+        panelArchivedBooks.setBounds(450, 80, 180, 130);
+        gradient.add(panelArchivedBooks);
+
+        lblArchivedBooks = new JLabel("0", JLabel.CENTER);
+        lblArchivedBooks.setForeground(new Color(200, 177, 228));
+        lblArchivedBooks.setFont(new Font("Bayon", Font.BOLD, 50));
+        lblArchivedBooks.setBounds(10, 10, 160, 80);
+        panelArchivedBooks.add(lblArchivedBooks);
+
+        JLabel lblArchivedBooks_1 = new JLabel("ARCHIVED BOOKS", JLabel.CENTER);
+        lblArchivedBooks_1.setForeground(Color.WHITE);
+        lblArchivedBooks_1.setFont(new Font("Bayon", Font.BOLD, 15));
+        lblArchivedBooks_1.setBounds(10, 91, 160, 29);
+        panelArchivedBooks.add(lblArchivedBooks_1);
+
+        JPanel panelTotalAuthors = new JPanel();
+        panelTotalAuthors.setLayout(null);
+        panelTotalAuthors.setBackground(new Color(155, 114, 207));
+        panelTotalAuthors.setBounds(655, 80, 180, 130);
+        gradient.add(panelTotalAuthors);
+
+        lblTotalAuthors = new JLabel("0", JLabel.CENTER);
+        lblTotalAuthors.setForeground(new Color(244, 239, 250));
+        lblTotalAuthors.setFont(new Font("Bayon", Font.BOLD, 50));
+        lblTotalAuthors.setBounds(10, 10, 160, 80);
+        panelTotalAuthors.add(lblTotalAuthors);
+
+        JLabel lblTotalAuthors_1 = new JLabel("TOTAL AUTHORS", JLabel.CENTER);
+        lblTotalAuthors_1.setFont(new Font("Bayon", Font.BOLD, 15));
+        lblTotalAuthors_1.setBounds(10, 91, 160, 29);
+        panelTotalAuthors.add(lblTotalAuthors_1);
+
+        JPanel panelTotalTitles = new JPanel();
+        panelTotalTitles.setLayout(null);
+        panelTotalTitles.setBackground(new Color(200, 177, 228));
+        panelTotalTitles.setBounds(860, 80, 180, 130);
+        gradient.add(panelTotalTitles);
+
+        lblTotalTitles = new JLabel("0", JLabel.CENTER);
+        lblTotalTitles.setForeground(new Color(47, 24, 75));
+        lblTotalTitles.setFont(new Font("Bayon", Font.BOLD, 50));
+        lblTotalTitles.setBounds(10, 10, 160, 80);
+        panelTotalTitles.add(lblTotalTitles);
+
+        JLabel lblTotalTitles_1 = new JLabel("TOTAL TITLES", JLabel.CENTER);
+        lblTotalTitles_1.setFont(new Font("Bayon", Font.BOLD, 15));
+        lblTotalTitles_1.setBounds(10, 91, 160, 29);
+        panelTotalTitles.add(lblTotalTitles_1);
+
+        JButton btnAdmin = new JButton("Admin");
+        btnAdmin.setBounds(920, 470, 120, 30);
+        gradient.add(btnAdmin);
+
+        btnAdmin.addActionListener(e -> {
+            P4Admin page4Frame = new P4Admin();
+            page4Frame.setVisible(true);
+            dispose();
+        });
+
+        tableModel = new DefaultTableModel() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+            public boolean isCellEditable(int row, int column) {
+                return false; 
+            }
+        };
+        table = new JTable(tableModel);
+        table.getTableHeader().setReorderingAllowed(false);
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBounds(40, 255, 1000, 200);
+        gradient.add(scrollPane);
+
+        String[] columnNames = {"Accession No.", "Call No.", "ISBN", "Author's First Name", "Author's Last Name", "Title",
+                "Publisher", "Place of Publication", "Copyright Year", "Date and Time Recorded"};
+        
+        tableModel.setColumnIdentifiers(columnNames);
+
+        JLabel lblNewLabel = new JLabel("Recently Added Books");
+        lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        lblNewLabel.setBounds(52, 232, 193, 19);
+        gradient.add(lblNewLabel);
+
+        refreshDashboardData();
+
+        setVisible(true);
+    }
+    
+    private void refreshDashboardData() {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+             Statement stmt = conn.createStatement()) {
+
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM books");
+            if (rs.next()) lblTotalBooks.setText(String.valueOf(rs.getInt(1)));
+
+            rs = stmt.executeQuery("SELECT COUNT(*) FROM publishers");
+            if (rs.next()) lblPublishersCount.setText(String.valueOf(rs.getInt(1)));
+
+            rs = stmt.executeQuery("SELECT COUNT(*) FROM ArchivedBooks");
+            if (rs.next()) lblArchivedBooks.setText(String.valueOf(rs.getInt(1)));
+
+            rs = stmt.executeQuery("SELECT COUNT(*) FROM authors");
+            if (rs.next()) lblTotalAuthors.setText(String.valueOf(rs.getInt(1)));
+
+            rs = stmt.executeQuery("SELECT COUNT(DISTINCT LOWER(TRIM(title))) FROM books");
+            if (rs.next()) lblTotalTitles.setText(String.valueOf(rs.getInt(1)));
+
+            loadRecentlyAddedBooks(conn);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to refresh data.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void loadRecentlyAddedBooks(Connection conn) {
+        tableModel.setRowCount(0);
+
+        String sql = "SELECT b.accession_number, b.call_number, b.isbn, a.author_firstname, a.author_lastname, b.title, p.publisher_name, "
+            	+ "p.place_of_publication, b.copyright_year, b.date_and_time_recorded FROM Books b JOIN Authors a ON b.author_id = a.author_id "
+            	+ "JOIN Publishers p ON b.publisher_id = p.publisher_id ORDER BY b.date_and_time_recorded DESC "
+        		+ "LIMIT 10";
+        
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Object[] row = new Object[10];
+                row[0] = rs.getString("accession_number");
+                row[1] = rs.getString("call_number");
+                row[2] = rs.getString("isbn");
+                row[3] = rs.getString("author_firstname");
+                row[4] = rs.getString("author_lastname");
+                row[5] = rs.getString("title");
+                row[6] = rs.getString("publisher_name");
+                row[7] = rs.getString("place_of_publication");
+                row[8] = rs.getInt("copyright_year");
+                row[9] = rs.getTimestamp("date_and_time_recorded");
+                tableModel.addRow(row);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error loading recently added books: " + e.getMessage(),
+                    "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new P3Admin());
+    }
+}
