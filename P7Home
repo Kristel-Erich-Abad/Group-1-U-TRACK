@@ -1,0 +1,334 @@
+package App;
+
+import java.awt.*;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
+import javax.swing.*;
+import javax.swing.table.*;
+
+public class P7Home extends JFrame {
+    private static final long serialVersionUID = 1L;
+    private JTable table;
+    private DefaultTableModel tableModel;
+    private TableRowSorter<DefaultTableModel> rowSorter;
+    private JTextField txtSearch;
+    private Connection conn;
+    
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/UTrack_Management";
+    private static final String DB_USER = "root";
+    private static final String DB_PASS = "nnnikkki14";
+
+
+    public P7Home() {
+        setTitle("U-TRACK Application");
+        setSize(1100, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        getContentPane().setLayout(null);
+
+        JPanel gradient = new JPanel() {
+            private static final long serialVersionUID = 1L;
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                int width = getWidth();
+                int height = getHeight();
+                Color color1 = new Color(174, 187, 219);
+                Color color2 = new Color(234, 228, 240);
+                GradientPaint gp = new GradientPaint(0, 0, color1, 0, height, color2);
+                g2d.setPaint(gp);
+                g2d.fillRect(0, 0, width, height);
+            }
+        };
+        gradient.setLayout(null);
+        setContentPane(gradient);
+
+        JPanel headerPanel = new JPanel();
+        headerPanel.setBackground(new Color(134, 152, 196));
+        headerPanel.setBounds(0, 0, 1086, 37);
+        gradient.add(headerPanel);
+        headerPanel.setLayout(null);
+
+        JLabel titleLabel = new JLabel("INVENTORY ARCHIVE", JLabel.CENTER);
+        titleLabel.setBounds(414, 5, 258, 33);
+        titleLabel.setFont(new Font("Consolas", Font.PLAIN, 27));
+        titleLabel.setForeground(Color.BLACK);
+        headerPanel.add(titleLabel);
+
+        JButton btnBack = new JButton("◄ HOME");
+        btnBack.setForeground(Color.WHITE);
+        btnBack.setFont(new Font("Arial", Font.PLAIN, 12));
+        btnBack.setBackground(new Color(83, 43, 136));
+        btnBack.setBounds(10, 7, 120, 22);
+        headerPanel.add(btnBack);
+        btnBack.addActionListener(e -> {
+            P4Intern page4 = new P4Intern();
+            page4.setVisible(true);
+            dispose();
+        });
+        
+        JButton btnLogout = new JButton("LOG OUT");
+        btnLogout.setForeground(new Color(255, 255, 255));
+        btnLogout.setFont(new Font("Arial", Font.PLAIN, 12));
+        btnLogout.setBackground(new Color(83, 43, 136));
+        btnLogout.setBounds(924, 7, 152, 22);
+        headerPanel.add(btnLogout);
+
+        btnLogout.addActionListener(e -> {
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    P1 page1Frame = new P1();
+                    page1Frame.setVisible(true);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+            dispose();
+        });
+
+        JPanel footerPanel = new JPanel();
+        footerPanel.setBounds(0, 517, 1086, 46);
+        footerPanel.setBackground(new Color(134, 152, 196));
+        footerPanel.setLayout(null);
+        gradient.add(footerPanel);
+
+        JLabel logo1 = new JLabel(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\logoumak-removebg-preview123.png"));
+        logo1.setBounds(10, 10, 26, 26);
+        footerPanel.add(logo1);
+
+        JLabel logo2 = new JLabel(new ImageIcon("C:\\Users\\Huawei\\Documents\\IMAGES\\School-of-Law-SOL.png"));
+        logo2.setBounds(200, 10, 26, 26);
+        footerPanel.add(logo2);
+
+        JLabel uniLabel = new JLabel("University of Makati");
+        uniLabel.setBounds(46, 17, 131, 13);
+        footerPanel.add(uniLabel);
+
+        JLabel schoolLabel = new JLabel("School of Law");
+        schoolLabel.setBounds(236, 17, 89, 13);
+        footerPanel.add(schoolLabel);
+
+        JLabel lblSearch = new JLabel("Search by Title:");
+        lblSearch.setFont(new Font("Arial", Font.PLAIN, 17));
+        lblSearch.setBounds(40, 60, 150, 30);
+        gradient.add(lblSearch);
+
+        txtSearch = new JTextField();
+        txtSearch.setBounds(190, 60, 300, 30);
+        gradient.add(txtSearch);
+
+        // Table setup
+        String[] columns = {"Accession No.", "Call No.", "ISBN", "Author's First Name", "Author's Last Name", "Title",
+                "Publisher", "Place of Publication", "Copyright Year", "Date Recorded", "Time Recorded"};
+
+        tableModel = new DefaultTableModel(columns, 0) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Disables editing for all cells
+            }
+        };
+
+        table = new JTable(tableModel);
+        table.getTableHeader().setReorderingAllowed(false);
+        rowSorter = new TableRowSorter<>(tableModel);
+        table.setRowSorter(rowSorter);
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBounds(40, 100, 1005, 324);
+        gradient.add(scrollPane);
+
+        // Search button
+        JButton btnSearch = new JButton("Search");
+        btnSearch.setFont(new Font("Arial", Font.BOLD, 14));
+        btnSearch.setBounds(510, 60, 100, 30);
+        gradient.add(btnSearch);
+
+        btnSearch.addActionListener(e -> {
+            String text = txtSearch.getText().trim();
+
+            // Disallow empty, numeric, or non-alphabetic inputs
+            if (text.isEmpty() || !text.matches("[a-zA-Z\\s]+")) {
+                JOptionPane.showMessageDialog(null,
+                    "Please enter a valid book title using letters only (no numbers or symbols).",
+                    "Invalid Input",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Apply the filter: match only if the title starts with the input (case-insensitive)
+            RowFilter<DefaultTableModel, Object> filter = RowFilter.regexFilter("(?i)^" + text, 5);
+            rowSorter.setRowFilter(filter);
+
+            // Check if any matching rows exist
+            if (table.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(null, "No matching records found.", "Search Result", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        
+        // Refresh button
+        JButton btnRefresh = new JButton("Refresh");
+        btnRefresh.setFont(new Font("Arial", Font.BOLD, 14));
+        btnRefresh.setBounds(620, 60, 100, 30);
+        gradient.add(btnRefresh);
+
+        btnRefresh.addActionListener(e -> {
+            txtSearch.setText("");
+            rowSorter.setRowFilter(null);
+            loadData();
+        });
+
+        // Retrieve button (move record back to Books)
+        JButton btnRetrieve = new JButton("RETRIEVE");
+        btnRetrieve.setFont(new Font("Arial", Font.BOLD, 20));
+        btnRetrieve.setBounds(460, 450, 141, 37);
+        gradient.add(btnRetrieve);
+
+        btnRetrieve.addActionListener(e -> {
+            int[] selectedRows = table.getSelectedRows();
+            if (selectedRows.length > 0) {
+                int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to retrieve the selected records?", "Confirm", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                	try {
+                	    conn.setAutoCommit(false);
+                	    PreparedStatement insertStmt = conn.prepareStatement(
+                	        "INSERT INTO Books (accession_number, call_number, isbn, author_id, title, publisher_id, copyright_year, date_and_time_recorded) " +
+                	        "SELECT accession_number, call_number, isbn, author_id, title, publisher_id, copyright_year, date_and_time_recorded " +
+                	        "FROM ArchivedBooks WHERE accession_number = ?"
+                	    );
+                	    PreparedStatement deleteStmt = conn.prepareStatement(
+                	        "DELETE FROM ArchivedBooks WHERE accession_number = ?"
+                	    );
+
+                	    for (int viewRow : selectedRows) {
+                	        int modelRow = table.convertRowIndexToModel(viewRow);
+                	        String accessionNo = (String) tableModel.getValueAt(modelRow, 0);
+
+                	        insertStmt.setString(1, accessionNo);
+                	        int inserted = insertStmt.executeUpdate();
+
+                	        if (inserted > 0) {
+                	            deleteStmt.setString(1, accessionNo);
+                	            deleteStmt.executeUpdate();
+                	        }
+                	    }
+
+                	    conn.commit();
+                	    conn.setAutoCommit(true);
+                	    loadData(); // Reload table once
+                	    JOptionPane.showMessageDialog(this, "Selected records retrieved successfully.");
+                	} catch (Exception ex) {
+                	    try {
+                	        conn.rollback();
+                	        conn.setAutoCommit(true);
+                	    } catch (SQLException rollbackEx) {
+                	        rollbackEx.printStackTrace();
+                	    }
+                	    ex.printStackTrace();
+                	    JOptionPane.showMessageDialog(this, "An error occurred during retrieval.");
+                	}
+
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Please select one or more records to retrieve.");
+            }
+        });
+
+        
+        try {
+            conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to connect to database.");
+            System.exit(1);
+        }
+
+        loadData();
+
+        setVisible(true);
+    }
+
+    private void loadData() {
+        tableModel.setRowCount(0);
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(
+            	"SELECT b.accession_number, b.call_number, b.isbn, a.author_firstname, a.author_lastname, b.title, p.publisher_name, "
+            	+ "p.place_of_publication, b.copyright_year, b.date_and_time_recorded FROM ArchivedBooks b JOIN Authors a ON b.author_id = a.author_id "
+            	+ "JOIN Publishers p ON b.publisher_id = p.publisher_id"
+            );
+
+            while (rs.next()) {
+                String datetime = rs.getString("date_and_time_recorded");
+                String datePart = "";
+                String timePart = "";
+
+                if (datetime != null) {
+                    try {
+                        LocalDateTime ldt = LocalDateTime.parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                        datePart = ldt.toLocalDate().toString(); // yyyy-MM-dd
+                        timePart = ldt.toLocalTime().toString(); // HH:mm:ss
+                    } catch (DateTimeParseException ex) {
+                        // Fallback if parsing fails (maybe just show raw string)
+                        if (datetime.contains(" ")) {
+                            String[] parts = datetime.split(" ", 2);
+                            datePart = parts[0];
+                            timePart = parts.length > 1 ? parts[1] : "";
+                        } else {
+                            datePart = datetime;
+                        }
+                    }
+                }
+                
+                String copyrightYearRaw = rs.getString("copyright_year");
+                String copyrightYearClean = "";
+                if (copyrightYearRaw != null) {
+                    // Extract first 4 digits if present, else empty
+                    if (copyrightYearRaw.matches("\\d{4}.*")) {
+                        copyrightYearClean = copyrightYearRaw.substring(0, 4);
+                    }
+                }
+                
+                tableModel.addRow(new Object[] {
+                    rs.getString("accession_number"),
+                    rs.getString("call_number"),
+                    rs.getString("ISBN"),
+                    rs.getString("author_firstname"),
+                    rs.getString("author_lastname"),
+                    rs.getString("title"),
+                    rs.getString("publisher_name"),
+                    rs.getString("place_of_publication"),
+                    copyrightYearClean,
+                    datePart,
+                    timePart
+                });
+            }
+            rs.close();
+            stmt.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to load archived books.");
+        }
+    }
+    
+    @Override
+    public void dispose() {
+        super.dispose();
+        try {
+            if (conn != null && !conn.isClosed()) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(P7Home::new);
+    }
+}
